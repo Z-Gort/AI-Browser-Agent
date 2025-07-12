@@ -10,8 +10,13 @@ export default defineConfig({
     plugins: [tailwindcss()],
     resolve: {
       alias: {
-        "@": path.resolve(__dirname, "./src"), // or "./src" if using src directory
+        "@": path.resolve(__dirname, "./src"),
       },
     },
   }),
+  manifest: {
+    name: "Browser Cursor",
+    description: "Cursor-like AI for your browser",
+    action: {}, // This enables the sidepanel to open on action click
+  },
 });

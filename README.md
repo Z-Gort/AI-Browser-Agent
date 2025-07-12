@@ -1,3 +1,2 @@
-# WXT + React
+# Browser For Cursor
 
-This template should help get you started developing with React in WXT.
