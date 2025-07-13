@@ -4,10 +4,11 @@
     "allowImportingTsExtensions": true,
     "jsx": "react-jsx",
     "baseUrl": ".",
-    "paths": { //temporary workaround: https://github.com/wxt-dev/examples/tree/main/examples/react-shadcn
-      "@/*": [
-        "./src/*" 
-      ]
+    "paths": {
+      //temporary workaround: https://github.com/wxt-dev/examples/tree/main/examples/react-shadcn
+      "@/*": ["./src/*"],
+      // Add backend path aliases to resolve backend types
+      "~/*": ["../backend/src/*"]
     }
   }
 }
