@@ -18,6 +18,11 @@ export default defineConfig({
     name: "Browser Cursor",
     description: "Cursor-like AI for your browser",
     action: {}, // This enables the sidepanel to open on action click
-    host_permissions: ["http://localhost:3001/*"],
+    permissions: ["cookies", "storage"],
+    host_permissions: [
+      "http://localhost:3001/*",
+      "http://localhost/*",
+      "https://epic-man-32.clerk.accounts.dev",
+    ],
   },
 });
