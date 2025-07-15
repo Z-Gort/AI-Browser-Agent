@@ -36,6 +36,7 @@ db.sqlite
 
 # Environment files
 .env*
+!.env.example
 
 # Vercel
 .vercel
@@ -58,6 +59,9 @@ stats-*.json
 *.njsproj
 *.sln
 *.sw?
+
+# Mastra
+.mastra
 
 # Editor directories and files
 .vscode/*

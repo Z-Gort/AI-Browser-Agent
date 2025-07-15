@@ -1,11 +1,16 @@
 import { convertToCoreMessages, type Message } from "ai";
 import { mastra } from "~/mastra";
-
-// Allow streaming responses up to 30 seconds
-export const maxDuration = 30;
+import { auth } from "@clerk/nextjs/server";
 
 export async function POST(req: Request) {
   try {
+    const { userId } = await auth();
+
+    if (!userId) {
+      console.log("Unauthorized");
+      return new Response("Unauthorized", { status: 401 });
+    }
+
     const body: unknown = await req.json();
     const { messages } = body as { messages: Message[] };
 

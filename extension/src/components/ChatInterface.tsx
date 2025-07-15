@@ -1,10 +1,25 @@
 import { useChat } from "@ai-sdk/react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@clerk/chrome-extension";
 
 export default function ChatInterface() {
+  const { getToken } = useAuth();
+
   const { messages, input, handleInputChange, handleSubmit, isLoading } =
     useChat({
       api: "http://localhost:3001/api/chat",
+      async fetch(url, options) { //override default fetch
+        const token = await getToken();
+        const headers = {
+          ...options?.headers,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        };
+
+        return fetch(url, {
+          ...options,
+          headers,
+        });
+      },
     });
 
   return (

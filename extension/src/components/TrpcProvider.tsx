@@ -2,10 +2,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { useState } from "react";
 import superjson from "superjson";
+import { useAuth } from "@clerk/chrome-extension";
 
-import { trpc } from "./trpc";
+import { trpc } from "../lib/trpc";
 
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
+  const { getToken } = useAuth();
+
   const [queryClient] = useState(() => new QueryClient());
   const [trpcClient] = useState(() =>
     trpc.createClient({
@@ -13,6 +16,10 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
         httpBatchLink({
           url: "http://localhost:3001/api/trpc",
           transformer: superjson,
+          headers: async () => {
+            const token = await getToken();
+            return token ? { Authorization: `Bearer ${token}` } : {};
+          },
         }),
       ],
     })
