@@ -169,11 +169,7 @@ var __turbopack_async_dependencies__ = __turbopack_handle_async_dependencies__([
 ;
 async function POST(req) {
     try {
-        // Check if we're getting the Authorization header
-        const authHeader = req.headers.get("Authorization");
-        console.log("Authorization header:", authHeader);
         const { userId } = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f40$clerk$2b$nextjs$40$6$2e$25$2e$0_next$40$15$2e$3$2e$5_$40$babel$2b$core$40$7$2e$28$2e$0_$40$opentelemetry$2b$api$40$1$2e$9$2e$0_react$2d$dom$40$_14ba89c6717cc21b4d3df1df2d53bd88$2f$node_modules$2f40$clerk$2f$nextjs$2f$dist$2f$esm$2f$app$2d$router$2f$server$2f$auth$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["auth"])();
-        console.log("userId:", userId);
         if (!userId) {
             console.log("Unauthorized");
             return new Response("Unauthorized", {

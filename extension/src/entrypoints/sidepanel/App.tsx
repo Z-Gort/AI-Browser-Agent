@@ -1,7 +1,7 @@
 import ChatInterface from "@/components/ChatInterface";
+import SimpleAuthForm from "@/components/SimpleAuthForm";
 import {
   ClerkProvider,
-  SignInButton,
   SignedIn,
   SignedOut,
   UserButton,
@@ -56,17 +56,15 @@ export default function App() {
       signUpFallbackRedirectUrl={browser.runtime.getURL("/sidepanel.html")}
     >
       <TRPCProvider>
-        <header className="w-full p-4 border-b">
-          <SignedOut>
-            <SignInButton mode="modal" />
-          </SignedOut>
-          <SignedIn>
-            
+        <SignedIn>
+          <header className="w-full p-4 border-b">
             <UserButton />
-          </SignedIn>
-        </header>
-        <ChatInterface />
-        <AuthTest />
+          </header>
+          <ChatInterface />
+        </SignedIn>
+        <SignedOut>
+          <SimpleAuthForm />
+        </SignedOut>
       </TRPCProvider>
     </ClerkProvider>
   );

@@ -398,7 +398,6 @@ var __turbopack_async_dependencies__ = __turbopack_handle_async_dependencies__([
     });
 };
 const handler = (req)=>{
-    console.log("req", req);
     return (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f40$trpc$2b$server$40$11$2e$4$2e$3_typescript$40$5$2e$8$2e$3$2f$node_modules$2f40$trpc$2f$server$2f$dist$2f$adapters$2f$fetch$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__["fetchRequestHandler"])({
         endpoint: "/api/trpc",
         req,
