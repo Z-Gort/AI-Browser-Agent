@@ -25,12 +25,12 @@ export default function ChatInterface() {
     });
 
   return (
-    <div className="flex flex-col h-screen bg-background">
+    <div className="flex flex-col h-full bg-background">
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-20">
         {messages.length === 0 ? (
           <div className="text-center text-muted-foreground py-8">
-            <p>Start a conversation with the AI assistant!</p>
+            <p className="text-sm">Start a conversation with the AI assistant!</p>
           </div>
         ) : (
           messages.map((message) => (
@@ -79,7 +79,7 @@ export default function ChatInterface() {
             type="text"
             value={input}
             onChange={handleInputChange}
-            placeholder="Say something..."
+            placeholder="Chat with AI..."
             className="flex-1"
             disabled={isLoading}
           />
