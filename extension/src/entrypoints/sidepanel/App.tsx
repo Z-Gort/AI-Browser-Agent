@@ -10,6 +10,7 @@ import {
 import { trpc } from "@/lib/trpc";
 import { TRPCProvider } from "@/components/TrpcProvider";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useState, useMemo } from "react";
 
 const PUBLISHABLE_KEY = import.meta.env.WXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
@@ -20,6 +21,21 @@ if (!PUBLISHABLE_KEY) {
 }
 
 function AppContent() {
+  const [enabledTools, setEnabledTools] = useState<string[]>([]);
+
+  const { data: integrationsData } = trpc.integrations.getAll.useQuery();
+
+  const connectedAndEnabledTools = useMemo(() => {
+    if (!integrationsData?.integrations) return [];
+
+    return integrationsData.integrations
+      .filter(
+        (integration) =>
+          integration.isConnected && enabledTools.includes(integration.slug)
+      )
+      .map((integration) => integration.slug);
+  }, [integrationsData, enabledTools]);
+
   return (
     <Tabs defaultValue="chat" className="h-full flex flex-col">
       <header className="w-full p-4 border-b">
@@ -31,14 +47,14 @@ function AppContent() {
           <UserButton />
         </div>
       </header>
-
-      {/* Tabs Content */}
       <TabsContent value="chat" className="flex-1 overflow-hidden m-0">
-        <ChatInterface />
+        <ChatInterface enabledToolSlugs={connectedAndEnabledTools} />
       </TabsContent>
-
       <TabsContent value="integrations" className="flex-1 overflow-hidden m-0">
-        <IntegrationsPage />
+        <IntegrationsPage
+          enabledTools={enabledTools}
+          setEnabledTools={setEnabledTools}
+        />
       </TabsContent>
     </Tabs>
   );

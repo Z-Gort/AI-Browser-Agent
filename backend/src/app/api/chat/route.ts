@@ -1,6 +1,14 @@
-import { convertToCoreMessages, type Message } from "ai";
-import { mastra } from "~/mastra";
 import { auth } from "@clerk/nextjs/server";
+import { convertToCoreMessages, type Message } from "ai";
+import { Composio } from "@composio/core";
+import { MastraProvider } from "@composio/mastra";
+import { openai } from "@ai-sdk/openai";
+import { Agent } from "@mastra/core/agent";
+import { CHAT_AGENT_INSTRUCTIONS } from "~/lib/agent-instructions";
+
+export const composio = new Composio({
+  provider: new MastraProvider(),
+});
 
 export async function POST(req: Request) {
   try {
@@ -12,16 +20,24 @@ export async function POST(req: Request) {
     }
 
     const body: unknown = await req.json();
-    const { messages } = body as { messages: Message[] };
+    const { messages, enabledToolSlugs = [] } = body as {
+      messages: Message[];
+      enabledToolSlugs: string[];
+    };
 
-    // Convert AI SDK messages to format Mastra can understand
+    // Gets 20 tools from Notion by default
+    const tools = await composio.tools.get(userId, { toolkits: enabledToolSlugs })
+
     const coreMessages = convertToCoreMessages(messages);
 
-    // Use Mastra agent with streaming
-    const chatAgent = mastra.getAgent("chatAgent");
-    const result = await chatAgent.stream(coreMessages);
+    const chatAgent = new Agent({
+      name: "Chat Agent",
+      instructions: CHAT_AGENT_INSTRUCTIONS,
+      model: openai("gpt-4o-mini"),
+      tools,
+    });
 
-    // Return Mastra's streaming response
+    const result = await chatAgent.stream(coreMessages);
     return result.toDataStreamResponse();
   } catch (error) {
     console.error("Chat API error:", error);
