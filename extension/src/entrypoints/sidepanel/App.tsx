@@ -52,7 +52,9 @@ function AppContent() {
 
   // Lift chat state to this level to persist across tab switches
   const chatState = useChat({
-    api: "http://localhost:3001/api/chat",
+    api: import.meta.env.DEV
+      ? "http://localhost:3001/api/chat"
+      : "https://browser-cursor-six.vercel.app/api/chat",
     body: {
       enabledToolSlugs: connectedAndEnabledTools,
     },

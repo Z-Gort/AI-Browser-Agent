@@ -16,7 +16,7 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
         httpBatchLink({
           url: import.meta.env.DEV
             ? "http://localhost:3001/api/trpc"
-            : "https://your-vercel-app.vercel.app/api/trpc",
+            : "https://browser-cursor-six.vercel.app/api/trpc",
           transformer: superjson,
           headers: async () => {
             const token = await getToken();

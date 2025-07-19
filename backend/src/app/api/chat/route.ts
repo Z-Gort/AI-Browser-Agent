@@ -3,7 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { Agent } from "@mastra/core/agent";
 import { convertToCoreMessages, type Message } from "ai";
 import { type NextRequest } from "next/server";
-import { CHAT_AGENT_INSTRUCTIONS, composio } from "~/lib/agent-instructions";
+import { CHAT_AGENT_INSTRUCTIONS_NO_TOOLS, CHAT_AGENT_INSTRUCTIONS_WITH_TOOLS, composio } from "~/lib/agent-instructions";
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,13 +35,15 @@ export async function POST(req: NextRequest) {
       },
     );
 
-    console.log("🔍 Tools:", Object.keys(tools));
-
     const coreMessages = convertToCoreMessages(messages);
+
+    const hasEnabledTools = enabledToolSlugs.length > 0;
 
     const chatAgent = new Agent({
       name: "Chat Agent",
-      instructions: CHAT_AGENT_INSTRUCTIONS,
+      instructions: hasEnabledTools
+        ? CHAT_AGENT_INSTRUCTIONS_WITH_TOOLS
+        : CHAT_AGENT_INSTRUCTIONS_NO_TOOLS,
       model: anthropic("claude-sonnet-4-20250514"),
       tools,
     });
