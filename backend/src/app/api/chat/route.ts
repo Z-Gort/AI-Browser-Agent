@@ -1,15 +1,9 @@
-import { auth } from "@clerk/nextjs/server";
-import { convertToCoreMessages, type Message } from "ai";
-import { Composio } from "@composio/core";
-import { MastraProvider } from "@composio/mastra";
 import { anthropic } from "@ai-sdk/anthropic";
+import { auth } from "@clerk/nextjs/server";
 import { Agent } from "@mastra/core/agent";
+import { convertToCoreMessages, type Message } from "ai";
 import { type NextRequest } from "next/server";
-import { CHAT_AGENT_INSTRUCTIONS } from "~/lib/agent-instructions";
-
-export const composio = new Composio({
-  provider: new MastraProvider(),
-});
+import { CHAT_AGENT_INSTRUCTIONS, composio } from "~/lib/agent-instructions";
 
 export async function POST(req: NextRequest) {
   try {

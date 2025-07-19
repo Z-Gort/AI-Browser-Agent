@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { composio } from "~/app/api/chat/route";
+import { composio } from "~/lib/agent-instructions";
 import { env } from "~/env";
 import { TRPCError } from "@trpc/server";
 

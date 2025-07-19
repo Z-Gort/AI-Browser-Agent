@@ -1,3 +1,6 @@
+import { Composio } from "@composio/core";
+import { MastraProvider } from "@composio/mastra";
+
 export const CHAT_AGENT_INSTRUCTIONS = `
 ## Prompt
 
@@ -27,3 +30,7 @@ You are a highly capable AI assistant designed to help users build with tools.
    - **DO NOT HAND OVER YOUR TURN UNTIL THE TASK IS COMPLETED.**
    - Always keep thinking and calling tools until the goal is achieved.
 `;
+
+export const composio = new Composio({
+   provider: new MastraProvider(),
+ });

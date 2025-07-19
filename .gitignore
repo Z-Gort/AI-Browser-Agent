@@ -27,7 +27,7 @@ node_modules
 db.sqlite
 
 # Next.js
-/.next/
+.next/
 /out/
 
 # Production builds
