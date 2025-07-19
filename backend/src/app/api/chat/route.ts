@@ -4,13 +4,14 @@ import { Composio } from "@composio/core";
 import { MastraProvider } from "@composio/mastra";
 import { anthropic } from "@ai-sdk/anthropic";
 import { Agent } from "@mastra/core/agent";
+import { type NextRequest } from "next/server";
 import { CHAT_AGENT_INSTRUCTIONS } from "~/lib/agent-instructions";
 
 export const composio = new Composio({
   provider: new MastraProvider(),
 });
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
 
