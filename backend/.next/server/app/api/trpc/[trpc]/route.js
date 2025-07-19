@@ -1,6 +1,6 @@
 const CHUNK_PUBLIC_PATH = "server/app/api/trpc/[trpc]/route.js";
 const runtime = require("../../../../chunks/[turbopack]_runtime.js");
-runtime.loadChunk("server/chunks/node_modules__pnpm_f57f1316._.js");
+runtime.loadChunk("server/chunks/node_modules__pnpm_e577e5be._.js");
 runtime.loadChunk("server/chunks/9bfa0_next_713cf95e._.js");
 runtime.loadChunk("server/chunks/92a6c_@trpc_server_dist_76d86373._.js");
 runtime.loadChunk("server/chunks/98319_zod_v3_e3189fa0._.js");
@@ -12,8 +12,7 @@ runtime.loadChunk("server/chunks/c6228_ai_dist_index_mjs_fe7e5d0f._.js");
 runtime.loadChunk("server/chunks/04763_@composio_client_d8e70d34._.js");
 runtime.loadChunk("server/chunks/dc6dc_tr46_c974d224._.js");
 runtime.loadChunk("server/chunks/78bb5_@composio_core_dist_index_dc482246.js");
-runtime.loadChunk("server/chunks/85eea_@ai-sdk_openai_dist_index_mjs_6d84f10e._.js");
-runtime.loadChunk("server/chunks/node_modules__pnpm_986972bc._.js");
+runtime.loadChunk("server/chunks/node_modules__pnpm_0827de39._.js");
 runtime.loadChunk("server/chunks/[root-of-the-server]__5fcc78c1._.js");
 runtime.getOrInstantiateRuntimeModule("[project]/.next-internal/server/app/api/trpc/[trpc]/route/actions.js [app-rsc] (server actions loader, ecmascript)", CHUNK_PUBLIC_PATH);
 runtime.getOrInstantiateRuntimeModule("[project]/node_modules/.pnpm/next@15.3.5_@babel+core@7.28.0_@opentelemetry+api@1.9.0_react-dom@19.1.0_react@19.1.0__react@19.1.0/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/src/app/api/trpc/[trpc]/route.ts [app-route] (ecmascript)\" } [app-route] (ecmascript)", CHUNK_PUBLIC_PATH);

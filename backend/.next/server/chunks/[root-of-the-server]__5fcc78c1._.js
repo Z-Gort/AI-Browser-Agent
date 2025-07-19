@@ -70,7 +70,8 @@ const env = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2
             "production"
         ]),
         OPENAI_API_KEY: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$zod$40$3$2e$25$2e$76$2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].string().min(1),
-        COMPOSIO_API_KEY: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$zod$40$3$2e$25$2e$76$2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].string().min(1)
+        COMPOSIO_API_KEY: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$zod$40$3$2e$25$2e$76$2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].string().min(1),
+        ANTHROPIC_API_KEY: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$zod$40$3$2e$25$2e$76$2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].string().min(1)
     },
     /**
    * Specify your client-side environment variables schema here. This way you can ensure the app
@@ -87,6 +88,7 @@ const env = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2
         NODE_ENV: ("TURBOPACK compile-time value", "development"),
         OPENAI_API_KEY: process.env.OPENAI_API_KEY,
         COMPOSIO_API_KEY: process.env.COMPOSIO_API_KEY,
+        ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
         NEXT_PUBLIC_NOTION_AUTH_CONFIG_ID: ("TURBOPACK compile-time value", "ac_zsrEgLnqePTH")
     },
     /**
@@ -333,17 +335,33 @@ __turbopack_context__.s({
     "CHAT_AGENT_INSTRUCTIONS": (()=>CHAT_AGENT_INSTRUCTIONS)
 });
 const CHAT_AGENT_INSTRUCTIONS = `
-You are a helpful AI assistant. You can have conversations with users and answer questions.
+## Prompt
 
-Be friendly, helpful, and concise in your responses. If you don't know something, 
-say so honestly. You can help with a wide variety of topics including:
-- General questions and information
-- Coding and programming help
-- Creative writing and brainstorming
-- Problem-solving and analysis
+You are a highly capable AI assistant designed to help users build with tools.
 
-When you have access to external tools, use them appropriately to help users with their tasks.
-Always aim to be accurate and helpful.
+### Your Role:
+- Act as a hands-on collaborator who actively uses available tools to solve problems and build things for the user.
+- When tools are available, **use them liberally and appropriately**—your job is to get things done.
+
+### Your Style:
+- Friendly, helpful, and concise.
+- Focus on clear steps, progress updates, and successful outcomes.
+
+### Your Behavior:
+1. **When given a task:**
+   - Break it down into clear, actionable steps (only if the task is complex).
+   - Inform the user of your plan before starting.
+
+2. **While executing:**
+   - Use tools continuously and proactively.
+   - After each step, evaluate:
+     - Did the step succeed?
+     - Are we closer to the goal?
+     - If something fails, revise your plan and keep going.
+
+3. **Important Rules:**
+   - **DO NOT HAND OVER YOUR TURN UNTIL THE TASK IS COMPLETED.**
+   - Always keep thinking and calling tools until the goal is achieved.
 `;
 }}),
 "[project]/src/app/api/chat/route.ts [app-route] (ecmascript)": ((__turbopack_context__) => {
@@ -359,7 +377,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f40$
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$ai$40$4$2e$3$2e$17_react$40$19$2e$1$2e$0_zod$40$3$2e$25$2e$76$2f$node_modules$2f$ai$2f$dist$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/.pnpm/ai@4.3.17_react@19.1.0_zod@3.25.76/node_modules/ai/dist/index.mjs [app-route] (ecmascript) <locals>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f40$composio$2b$core$40$0$2e$1$2e$36$2d$next$2e$10$2f$node_modules$2f40$composio$2f$core$2f$dist$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/.pnpm/@composio+core@0.1.36-next.10/node_modules/@composio/core/dist/index.js [app-route] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f40$composio$2b$mastra$40$0$2e$1$2e$35_$40$composio$2b$core$40$0$2e$1$2e$36$2d$next$2e$10_$40$mastra$2b$core$40$0$2e$10$2e$12_openapi$2d$type_1d852cccbded49f1001f380dac8e2608$2f$node_modules$2f40$composio$2f$mastra$2f$dist$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/.pnpm/@composio+mastra@0.1.35_@composio+core@0.1.36-next.10_@mastra+core@0.10.12_openapi-type_1d852cccbded49f1001f380dac8e2608/node_modules/@composio/mastra/dist/index.js [app-route] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f40$ai$2d$sdk$2b$openai$40$1$2e$3$2e$23_zod$40$3$2e$25$2e$76$2f$node_modules$2f40$ai$2d$sdk$2f$openai$2f$dist$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/.pnpm/@ai-sdk+openai@1.3.23_zod@3.25.76/node_modules/@ai-sdk/openai/dist/index.mjs [app-route] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f40$ai$2d$sdk$2b$anthropic$40$1$2e$2$2e$12_zod$40$3$2e$25$2e$76$2f$node_modules$2f40$ai$2d$sdk$2f$anthropic$2f$dist$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/.pnpm/@ai-sdk+anthropic@1.2.12_zod@3.25.76/node_modules/@ai-sdk/anthropic/dist/index.mjs [app-route] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$externals$5d2f40$mastra$2f$core$2f$agent__$5b$external$5d$__$2840$mastra$2f$core$2f$agent$2c$__esm_import$29$__ = __turbopack_context__.i("[externals]/@mastra/core/agent [external] (@mastra/core/agent, esm_import)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$agent$2d$instructions$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/agent-instructions.ts [app-route] (ecmascript)");
 var __turbopack_async_dependencies__ = __turbopack_handle_async_dependencies__([
@@ -381,7 +399,6 @@ async function POST(req) {
     try {
         const { userId } = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f40$clerk$2b$nextjs$40$6$2e$25$2e$0_next$40$15$2e$3$2e$5_$40$babel$2b$core$40$7$2e$28$2e$0_$40$opentelemetry$2b$api$40$1$2e$9$2e$0_react$2d$dom$40$_14ba89c6717cc21b4d3df1df2d53bd88$2f$node_modules$2f40$clerk$2f$nextjs$2f$dist$2f$esm$2f$app$2d$router$2f$server$2f$auth$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["auth"])();
         if (!userId) {
-            console.log("Unauthorized");
             return new Response("Unauthorized", {
                 status: 401
             });
@@ -389,14 +406,20 @@ async function POST(req) {
         const body = await req.json();
         const { messages, enabledToolSlugs = [] } = body;
         const tools = await composio.tools.get(userId, {
-            toolkits: enabledToolSlugs
+            toolkits: enabledToolSlugs,
+            limit: 30
+        }, {
+            beforeExecute: ({ toolSlug, toolkitSlug, params })=>{
+                console.log(`🔧 Tool about to execute: ${toolSlug} from ${toolkitSlug}`);
+                return params;
+            }
         });
-        console.log("GOTTEN TOOLS", tools);
+        console.log("🔍 Tools:", Object.keys(tools));
         const coreMessages = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$ai$40$4$2e$3$2e$17_react$40$19$2e$1$2e$0_zod$40$3$2e$25$2e$76$2f$node_modules$2f$ai$2f$dist$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$locals$3e$__["convertToCoreMessages"])(messages);
         const chatAgent = new __TURBOPACK__imported__module__$5b$externals$5d2f40$mastra$2f$core$2f$agent__$5b$external$5d$__$2840$mastra$2f$core$2f$agent$2c$__esm_import$29$__["Agent"]({
             name: "Chat Agent",
             instructions: __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$agent$2d$instructions$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["CHAT_AGENT_INSTRUCTIONS"],
-            model: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f40$ai$2d$sdk$2b$openai$40$1$2e$3$2e$23_zod$40$3$2e$25$2e$76$2f$node_modules$2f40$ai$2d$sdk$2f$openai$2f$dist$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__["openai"])("gpt-4o-mini"),
+            model: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f40$ai$2d$sdk$2b$anthropic$40$1$2e$2$2e$12_zod$40$3$2e$25$2e$76$2f$node_modules$2f40$ai$2d$sdk$2f$anthropic$2f$dist$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__["anthropic"])("claude-sonnet-4-20250514"),
             tools
         });
         const result = await chatAgent.stream(coreMessages);

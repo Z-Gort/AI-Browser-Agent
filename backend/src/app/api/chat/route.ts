@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { convertToCoreMessages, type Message } from "ai";
 import { Composio } from "@composio/core";
 import { MastraProvider } from "@composio/mastra";
-import { openai } from "@ai-sdk/openai";
+import { anthropic } from "@ai-sdk/anthropic";
 import { Agent } from "@mastra/core/agent";
 import { CHAT_AGENT_INSTRUCTIONS } from "~/lib/agent-instructions";
 
@@ -15,7 +15,6 @@ export async function POST(req: Request) {
     const { userId } = await auth();
 
     if (!userId) {
-      console.log("Unauthorized");
       return new Response("Unauthorized", { status: 401 });
     }
 
@@ -25,15 +24,30 @@ export async function POST(req: Request) {
       enabledToolSlugs: string[];
     };
 
-    // Gets 20 tools from Notion by default
-    const tools = await composio.tools.get(userId, { toolkits: enabledToolSlugs })
+    const tools = await composio.tools.get(
+      userId,
+      {
+        toolkits: enabledToolSlugs,
+        limit: 30,
+      },
+      {
+        beforeExecute: ({ toolSlug, toolkitSlug, params }) => {
+          console.log(
+            `🔧 Tool about to execute: ${toolSlug} from ${toolkitSlug}`,
+          );
+          return params;
+        },
+      },
+    );
+
+    console.log("🔍 Tools:", Object.keys(tools));
 
     const coreMessages = convertToCoreMessages(messages);
 
     const chatAgent = new Agent({
       name: "Chat Agent",
       instructions: CHAT_AGENT_INSTRUCTIONS,
-      model: openai("gpt-4o-mini"),
+      model: anthropic("claude-sonnet-4-20250514"),
       tools,
     });
 

@@ -151,11 +151,7 @@ export default function IntegrationsPage({
     handleConnect(integrationId);
   };
 
-  const handleToggle = (
-    toolSlug: string,
-    enabled: boolean,
-    isConnected = false
-  ) => {
+  const handleToggle = (toolSlug: string, enabled: boolean) => {
     setEnabledTools((prev) => {
       if (enabled) {
         // Add if not already present
@@ -266,11 +262,7 @@ export default function IntegrationsPage({
                       id={`enable-${integration.slug}`}
                       checked={isEnabled}
                       onCheckedChange={(enabled: boolean) =>
-                        handleToggle(
-                          integration.slug,
-                          enabled,
-                          integration.isConnected || false
-                        )
+                        handleToggle(integration.slug, enabled)
                       }
                       aria-label={`Enable ${integration.name}`}
                     />
