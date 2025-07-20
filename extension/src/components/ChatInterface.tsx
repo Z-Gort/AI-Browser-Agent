@@ -1,7 +1,7 @@
 import { useChat } from "@ai-sdk/react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef } from "react";
-import { Loader2, Wrench, ArrowUp } from "lucide-react";
+import { Loader2, Wrench, ArrowUp, Plus } from "lucide-react";
 import type { UIMessage } from "ai";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
@@ -9,11 +9,13 @@ import remarkBreaks from "remark-breaks";
 interface ChatInterfaceProps {
   enabledToolSlugs: string[];
   chatState: ReturnType<typeof useChat>;
+  onNewThread: () => void;
 }
 
 export default function ChatInterface({
   enabledToolSlugs,
   chatState,
+  onNewThread,
 }: ChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -186,6 +188,20 @@ export default function ChatInterface({
                 className="h-6 w-6 p-0 rounded-full"
               >
                 <ArrowUp className="h-2 w-2" />
+              </Button>
+            </div>
+
+            {/* New Thread button - bottom left */}
+            <div className="absolute bottom-0 left-0 pb-1.5 pl-1.5">
+              <Button
+                type="button"
+                onClick={onNewThread}
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 rounded-full"
+                title="Start new thread"
+              >
+                <Plus className="h-2 w-2" />
               </Button>
             </div>
           </form>

@@ -59,9 +59,6 @@ export async function POST(req: NextRequest) {
       memory,
     });
 
-    console.log("threadId", threadId);
-    console.log("resourceId", resourceId);
-
     const result = await chatAgent.stream(message?.content ?? "", {
       threadId,
       resourceId,

@@ -9,15 +9,21 @@ import { useChat } from "@ai-sdk/react";
 
 export default function AppContent() {
   const [enabledTools, setEnabledTools] = useState<string[]>([]);
+  const [createNewThread, setCreateNewThread] = useState(false);
   const { getToken, userId, isLoaded } = useAuth();
 
   const { data: integrationsData, isLoading: integrationsLoading } =
     trpc.integrations.getAll.useQuery();
 
-  const { data: threadData, isLoading: threadLoading } =
-    trpc.history.getOrCreateThreadId.useQuery({
-      resourceId: userId!,
-    });
+  // Get thread - either most recent or create new based on createNewThread flag
+  const {
+    data: threadData,
+    isLoading: threadLoading,
+    refetch: refetchThread,
+  } = trpc.history.getOrCreateThreadId.useQuery({
+    resourceId: userId!,
+    createNew: createNewThread,
+  });
 
   // Fetch initial messages when we have a threadId
   const { data: messagesData, isLoading: messagesLoading } =
@@ -53,6 +59,7 @@ export default function AppContent() {
   }, [integrationsData, enabledTools]);
 
   const chatState = useChat({
+    id: threadData?.threadId,
     api: import.meta.env.DEV
       ? "http://localhost:3001/api/chat"
       : "https://browser-cursor-six.vercel.app/api/chat",
@@ -85,6 +92,14 @@ export default function AppContent() {
     },
   });
 
+  // Function to create a new thread
+  const handleNewThread = async () => {
+    setCreateNewThread(true);
+    await refetchThread();
+    chatState.setMessages([]);
+    setCreateNewThread(false);
+  };
+
   if (threadLoading || integrationsLoading || messagesLoading || !isLoaded) {
     return (
       <div className="h-full flex flex-col">
@@ -99,7 +114,6 @@ export default function AppContent() {
           <div className="p-4 border-t">
             <div className="flex gap-3">
               <Skeleton className="h-10 flex-1" />
-              <Skeleton className="h-10 w-15" />
             </div>
           </div>
         </div>
@@ -122,6 +136,7 @@ export default function AppContent() {
         <ChatInterface
           enabledToolSlugs={connectedAndEnabledTools}
           chatState={chatState}
+          onNewThread={handleNewThread}
         />
       </TabsContent>
       <TabsContent value="integrations" className="flex-1 overflow-hidden m-0">

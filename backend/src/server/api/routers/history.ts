@@ -10,12 +10,22 @@ export const historyRouter = createTRPCRouter({
     .input(
       z.object({
         resourceId: z.string(),
+        createNew: z.boolean().optional().default(false),
       }),
     )
     .query(async ({ input }) => {
       try {
-        const { resourceId } = input;
+        const { resourceId, createNew } = input;
 
+        // If createNew is true, always create a new thread
+        if (createNew) {
+          const newThread = await memory.createThread({
+            resourceId,
+          });
+          return { threadId: newThread.id };
+        }
+
+        // Otherwise, try to get the most recent thread
         const existingThreads = await db
           .select()
           .from(mastraThreads)
@@ -26,10 +36,10 @@ export const historyRouter = createTRPCRouter({
         if (existingThreads.length > 0) {
           return { threadId: existingThreads[0]!.id };
         } else {
+          // No existing threads, create a new one
           const newThread = await memory.createThread({
             resourceId,
           });
-
           return { threadId: newThread.id };
         }
       } catch (error) {
