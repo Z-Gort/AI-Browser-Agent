@@ -2,6 +2,8 @@ import { Memory } from "@mastra/memory";
 import { PostgresStore } from "@mastra/pg";
 import { TokenLimiter, ToolCallFilter } from "@mastra/memory/processors";
 import { env } from "~/env";
+import { openai } from "@ai-sdk/openai";
+
 
 export const memory =  new Memory({
     storage: new PostgresStore({
@@ -10,6 +12,12 @@ export const memory =  new Memory({
     options: {
       lastMessages: 15,
       semanticRecall: false,
+      threads: {
+        generateTitle: {
+          model: openai("gpt-4.1-nano"), // Use cheaper model for titles
+          instructions: "Generate a concise title for this conversation based on the first user message.",
+        },
+      }
     },
     processors: [
       new ToolCallFilter(),

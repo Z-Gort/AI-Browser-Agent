@@ -28,7 +28,6 @@ export const historyRouter = createTRPCRouter({
         } else {
           const newThread = await memory.createThread({
             resourceId,
-            title: "New Conversation",
           });
 
           return { threadId: newThread.id };
