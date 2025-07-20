@@ -24,9 +24,14 @@ if (!PUBLISHABLE_KEY) {
 
 function AppContent() {
   const [enabledTools, setEnabledTools] = useState<string[]>([]);
-  const { getToken } = useAuth();
+  const { getToken, userId } = useAuth();
 
   const { data: integrationsData } = trpc.integrations.getAll.useQuery();
+
+  const { data: threadData } = trpc.history.getOrCreateThreadId.useQuery(
+    { resourceId: userId! },
+    { enabled: !!userId } // for now this module renders for signed in and signed out users
+  );
 
   // Set all available tools as enabled by default when data loads
   useEffect(() => {
@@ -50,13 +55,23 @@ function AppContent() {
       .map((integration) => integration.slug);
   }, [integrationsData, enabledTools]);
 
-  // Lift chat state to this level to persist across tab switches
   const chatState = useChat({
     api: import.meta.env.DEV
       ? "http://localhost:3001/api/chat"
       : "https://browser-cursor-six.vercel.app/api/chat",
-    body: {
-      enabledToolSlugs: connectedAndEnabledTools,
+    experimental_prepareRequestBody: (request) => {
+      // Get the last message from the request
+      const lastMessage =
+        request.messages.length > 0
+          ? request.messages[request.messages.length - 1]
+          : null;
+
+      return {
+        message: lastMessage,
+        threadId: threadData?.threadId,
+        resourceId: userId,
+        enabledToolSlugs: connectedAndEnabledTools,
+      };
     },
     async fetch(url, options) {
       const token = await getToken();

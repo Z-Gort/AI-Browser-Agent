@@ -1,10 +1,9 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
-import { db } from "~/server/db";
+import { db, mastraThreads } from "~/server/db";
 import { desc, eq } from "drizzle-orm";
 import { memory } from "~/lib/memory";
-import { mastraThreads } from "~/server/db/migrations/schema";
 
 export const historyRouter = createTRPCRouter({
   getOrCreateThreadId: protectedProcedure

@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
+import { trpc } from "../lib/trpc";
 
 const DEFAULT_PASSWORD = "simple-auth-password-123"; // Auto-filled password for all users
 
@@ -19,6 +20,7 @@ export default function SimpleAuthForm() {
 
   const { signUp, setActive: setActiveSignUp } = useSignUp();
   const { signIn, setActive: setActiveSignIn } = useSignIn();
+  const createUser = trpc.users.createUser.useMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,6 +53,13 @@ export default function SimpleAuthForm() {
             await setActiveSignUp?.({
               session: signUpAttempt.createdSessionId,
             });
+
+            if (signUpAttempt.createdUserId) {
+              await createUser.mutateAsync({
+                clerkId: signUpAttempt.createdUserId,
+                name: name.trim(),
+              });
+            }
             return;
           }
         } else {

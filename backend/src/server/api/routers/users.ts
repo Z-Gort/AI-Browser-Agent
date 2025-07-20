@@ -1,8 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
-import { db } from "~/server/db";
-import { users } from "~/server/db/migrations/schema";
+import { db, users } from "~/server/db";
 
 export const usersRouter = createTRPCRouter({
   createUser: protectedProcedure
