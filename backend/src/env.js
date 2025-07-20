@@ -11,6 +11,7 @@ export const env = createEnv({
     OPENAI_API_KEY: z.string().min(1),
     COMPOSIO_API_KEY: z.string().min(1),
     ANTHROPIC_API_KEY: z.string().min(1),
+    NEON_URL: z.string().min(1),
   },
 
   /**
@@ -32,6 +33,7 @@ export const env = createEnv({
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     COMPOSIO_API_KEY: process.env.COMPOSIO_API_KEY,
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
+    NEON_URL: process.env.NEON_URL,
     NEXT_PUBLIC_NOTION_AUTH_CONFIG_ID:
       process.env.NEXT_PUBLIC_NOTION_AUTH_CONFIG_ID,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
