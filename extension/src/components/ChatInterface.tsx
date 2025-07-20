@@ -1,7 +1,7 @@
 import { useChat } from "@ai-sdk/react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef } from "react";
-import { Loader2, Wrench, ArrowUp, Plus } from "lucide-react";
+import { Loader2, Wrench, ArrowUp, MessageSquarePlus } from "lucide-react";
 import type { UIMessage } from "ai";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
@@ -201,7 +201,7 @@ export default function ChatInterface({
                 className="h-6 w-6 p-0 rounded-full"
                 title="Start new thread"
               >
-                <Plus className="h-2 w-2" />
+                <MessageSquarePlus className="h-2 w-2" />
               </Button>
             </div>
           </form>
