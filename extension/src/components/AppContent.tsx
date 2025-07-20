@@ -59,7 +59,6 @@ export default function AppContent() {
   }, [integrationsData, enabledTools]);
 
   const chatState = useChat({
-    id: threadData?.threadId,
     api: import.meta.env.DEV
       ? "http://localhost:3001/api/chat"
       : "https://browser-cursor-six.vercel.app/api/chat",
@@ -92,12 +91,15 @@ export default function AppContent() {
     },
   });
 
+  console.log("THREAD DATA", threadData);
+  console.log("create new thread", createNewThread);
+  console.log("MESSAGES DATA", messagesData);
+
   // Function to create a new thread
   const handleNewThread = async () => {
     setCreateNewThread(true);
     await refetchThread();
     chatState.setMessages([]);
-    setCreateNewThread(false);
   };
 
   if (threadLoading || integrationsLoading || messagesLoading || !isLoaded) {

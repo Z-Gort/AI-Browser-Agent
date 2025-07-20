@@ -15,6 +15,7 @@ export const historyRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       try {
+        console.log("create new", input.createNew);
         const { resourceId, createNew } = input;
 
         // If createNew is true, always create a new thread
