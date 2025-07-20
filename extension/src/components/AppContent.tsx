@@ -1,0 +1,143 @@
+import ChatInterface from "@/components/ChatInterface";
+import IntegrationsPage from "@/components/IntegrationsPage";
+import { UserButton, useAuth } from "@clerk/chrome-extension";
+import { trpc } from "@/lib/trpc";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useState, useMemo, useEffect } from "react";
+import { useChat } from "@ai-sdk/react";
+
+export default function AppContent() {
+  const [enabledTools, setEnabledTools] = useState<string[]>([]);
+  const { getToken, userId, isLoaded } = useAuth();
+
+  const { data: integrationsData, isLoading: integrationsLoading } =
+    trpc.integrations.getAll.useQuery();
+
+  const { data: threadData, isLoading: threadLoading } =
+    trpc.history.getOrCreateThreadId.useQuery({
+      resourceId: userId!,
+    });
+
+  // Fetch initial messages when we have a threadId
+  const { data: messagesData, isLoading: messagesLoading } =
+    trpc.history.getMessages.useQuery(
+      {
+        threadId: threadData?.threadId!,
+      },
+      {
+        enabled: !!threadData?.threadId,
+      }
+    );
+
+  // Set all available tools as enabled by default when data loads
+  useEffect(() => {
+    if (integrationsData?.integrations && enabledTools.length === 0) {
+      const allSlugs = integrationsData.integrations.map(
+        (integration) => integration.slug
+      );
+      setEnabledTools(allSlugs);
+    }
+  }, [integrationsData, enabledTools]);
+
+  //The tools the AI can use
+  const connectedAndEnabledTools = useMemo(() => {
+    if (!integrationsData?.integrations) return [];
+
+    return integrationsData.integrations
+      .filter(
+        (integration) =>
+          integration.isConnected && enabledTools.includes(integration.slug)
+      )
+      .map((integration) => integration.slug);
+  }, [integrationsData, enabledTools]);
+
+  const chatState = useChat({
+    api: import.meta.env.DEV
+      ? "http://localhost:3001/api/chat"
+      : "https://browser-cursor-six.vercel.app/api/chat",
+    initialMessages: messagesData?.messages || [],
+    experimental_prepareRequestBody: (request) => {
+      // Get the last message from the request
+      const lastMessage =
+        request.messages.length > 0
+          ? request.messages[request.messages.length - 1]
+          : null;
+
+      return {
+        message: lastMessage,
+        threadId: threadData?.threadId,
+        resourceId: userId,
+        enabledToolSlugs: connectedAndEnabledTools,
+      };
+    },
+    async fetch(url, options) {
+      const token = await getToken();
+      const headers = {
+        ...options?.headers,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      };
+
+      return fetch(url, {
+        ...options,
+        headers,
+      });
+    },
+  });
+
+  if (threadLoading || integrationsLoading || messagesLoading || !isLoaded) {
+    return (
+      <div className="h-full flex flex-col">
+        <header className="sticky top-0 z-10 w-full p-4 border-b bg-background">
+          <div className="flex items-center gap-4">
+            <Skeleton className="h-10 flex-1" />
+            <Skeleton className="h-8 w-8 rounded-full" />
+          </div>
+        </header>
+        <div className="flex-1 p-4 space-y-4">
+          <div className="space-y-3">
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+            <Skeleton className="h-4 w-5/6" />
+          </div>
+          <div className="space-y-3">
+            <Skeleton className="h-4 w-2/3" />
+            <Skeleton className="h-4 w-4/5" />
+            <Skeleton className="h-4 w-1/3" />
+          </div>
+          <div className="space-y-3">
+            <Skeleton className="h-4 w-1/2" />
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-4 w-2/5" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <Tabs defaultValue="chat" className="h-full flex flex-col">
+      <header className="sticky top-0 z-10 w-full p-4 border-b bg-background">
+        <div className="flex items-center gap-4">
+          <TabsList className="grid grid-cols-2 flex-1">
+            <TabsTrigger value="chat">Chat</TabsTrigger>
+            <TabsTrigger value="integrations">Integrations</TabsTrigger>
+          </TabsList>
+          <UserButton />
+        </div>
+      </header>
+      <TabsContent value="chat" className="flex-1 overflow-hidden m-0">
+        <ChatInterface
+          enabledToolSlugs={connectedAndEnabledTools}
+          chatState={chatState}
+        />
+      </TabsContent>
+      <TabsContent value="integrations" className="flex-1 overflow-hidden m-0">
+        <IntegrationsPage
+          enabledTools={enabledTools}
+          setEnabledTools={setEnabledTools}
+        />
+      </TabsContent>
+    </Tabs>
+  );
+}

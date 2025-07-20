@@ -41,4 +41,31 @@ export const historyRouter = createTRPCRouter({
         });
       }
     }),
+
+  getMessages: protectedProcedure
+    .input(
+      z.object({
+        threadId: z.string(),
+      }),
+    )
+    .query(async ({ input }) => {
+      try {
+        const { threadId } = input;
+
+        const { uiMessages } = await memory.query({
+          threadId,
+          selectBy: {
+            last: 15,
+          },
+        });
+
+        return { messages: uiMessages };
+      } catch (error) {
+        console.error("Failed to get messages:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to get messages",
+        });
+      }
+    }),
 });
