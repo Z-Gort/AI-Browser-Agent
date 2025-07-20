@@ -9,30 +9,25 @@ import { useChat } from "@ai-sdk/react";
 
 export default function AppContent() {
   const [enabledTools, setEnabledTools] = useState<string[]>([]);
-  const [createNewThread, setCreateNewThread] = useState(false);
+  const [newThreadTrigger, setNewThreadTrigger] = useState<number>(0); // 0 means try to get newest thread (or create if none exists), above 0 means create new thread
   const { getToken, userId, isLoaded } = useAuth();
 
   const { data: integrationsData, isLoading: integrationsLoading } =
     trpc.integrations.getAll.useQuery();
 
-  // Get thread - either most recent or create new based on createNewThread flag
-  const {
-    data: threadData,
-    isLoading: threadLoading,
-    refetch: refetchThread,
-  } = trpc.history.getOrCreateThreadId.useQuery({
-    resourceId: userId!,
-    createNew: createNewThread,
-  });
+  const { data: threadData, isLoading: threadLoading } =
+    trpc.history.getOrCreateThreadId.useQuery({
+      resourceId: userId!,
+      createNew: newThreadTrigger > 0,
+    });
 
-  // Fetch initial messages when we have a threadId
   const { data: messagesData, isLoading: messagesLoading } =
     trpc.history.getMessages.useQuery(
       {
         threadId: threadData?.threadId!,
       },
       {
-        enabled: !!threadData?.threadId,
+        enabled: !!threadData?.threadId && newThreadTrigger === 0, // Only fetch messages for existing threads
       }
     );
 
@@ -59,6 +54,7 @@ export default function AppContent() {
   }, [integrationsData, enabledTools]);
 
   const chatState = useChat({
+    id: threadData?.threadId,
     api: import.meta.env.DEV
       ? "http://localhost:3001/api/chat"
       : "https://browser-cursor-six.vercel.app/api/chat",
@@ -91,15 +87,9 @@ export default function AppContent() {
     },
   });
 
-  console.log("THREAD DATA", threadData);
-  console.log("create new thread", createNewThread);
-  console.log("MESSAGES DATA", messagesData);
-
   // Function to create a new thread
   const handleNewThread = async () => {
-    setCreateNewThread(true);
-    await refetchThread();
-    chatState.setMessages([]);
+    setNewThreadTrigger((prev) => prev + 1);
   };
 
   if (threadLoading || integrationsLoading || messagesLoading || !isLoaded) {

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
-import { db, mastraThreads } from "~/server/db";
+import { db, mastraThreads, mastraMessages } from "~/server/db";
 import { desc, eq } from "drizzle-orm";
 import { memory } from "~/lib/memory";
 
@@ -26,18 +26,16 @@ export const historyRouter = createTRPCRouter({
           return { threadId: newThread.id };
         }
 
-        // Otherwise, try to get the most recent thread
-        const existingThreads = await db
-          .select()
-          .from(mastraThreads)
-          .where(eq(mastraThreads.resourceId, resourceId))
-          .orderBy(desc(mastraThreads.updatedAt))
+        const mostRecentMessage = await db
+          .select({ threadId: mastraMessages.threadId })
+          .from(mastraMessages)
+          .where(eq(mastraMessages.resourceId, resourceId))
+          .orderBy(desc(mastraMessages.createdAt))
           .limit(1);
 
-        if (existingThreads.length > 0) {
-          return { threadId: existingThreads[0]!.id };
+        if (mostRecentMessage.length > 0) {
+          return { threadId: mostRecentMessage[0]!.threadId };
         } else {
-          // No existing threads, create a new one
           const newThread = await memory.createThread({
             resourceId,
           });
