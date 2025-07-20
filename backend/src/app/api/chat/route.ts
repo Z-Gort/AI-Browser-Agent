@@ -1,9 +1,14 @@
 import { anthropic } from "@ai-sdk/anthropic";
 import { auth } from "@clerk/nextjs/server";
 import { Agent } from "@mastra/core/agent";
-import { convertToCoreMessages, type Message } from "ai";
+import { type Message } from "ai";
 import { type NextRequest } from "next/server";
-import { CHAT_AGENT_INSTRUCTIONS_NO_TOOLS, CHAT_AGENT_INSTRUCTIONS_WITH_TOOLS, composio } from "~/lib/agent-instructions";
+import {
+  CHAT_AGENT_INSTRUCTIONS_NO_TOOLS,
+  CHAT_AGENT_INSTRUCTIONS_WITH_TOOLS,
+  composio,
+} from "~/lib/agent-instructions";
+import { memory } from "~/lib/memory";
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,8 +19,15 @@ export async function POST(req: NextRequest) {
     }
 
     const body: unknown = await req.json();
-    const { messages, enabledToolSlugs = [] } = body as {
-      messages: Message[];
+    const {
+      message,
+      threadId,
+      resourceId,
+      enabledToolSlugs = [],
+    } = body as {
+      message: Message | null;
+      threadId: string;
+      resourceId: string;
       enabledToolSlugs: string[];
     };
 
@@ -35,8 +47,6 @@ export async function POST(req: NextRequest) {
       },
     );
 
-    const coreMessages = convertToCoreMessages(messages);
-
     const hasEnabledTools = enabledToolSlugs.length > 0;
 
     const chatAgent = new Agent({
@@ -46,9 +56,17 @@ export async function POST(req: NextRequest) {
         : CHAT_AGENT_INSTRUCTIONS_NO_TOOLS,
       model: anthropic("claude-sonnet-4-20250514"),
       tools,
+      memory,
     });
 
-    const result = await chatAgent.stream(coreMessages);
+    console.log("threadId", threadId);
+    console.log("resourceId", resourceId);
+
+    const result = await chatAgent.stream(message?.content ?? "", {
+      threadId,
+      resourceId,
+    });
+
     return result.toDataStreamResponse();
   } catch (error) {
     console.error("Chat API error:", error);
