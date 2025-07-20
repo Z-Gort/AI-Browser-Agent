@@ -26,16 +26,49 @@ export const historyRouter = createTRPCRouter({
           return { threadId: newThread.id };
         }
 
+        // Find the most recent thread by querying the most recent message from this user
         const mostRecentMessage = await db
-          .select({ threadId: mastraMessages.threadId })
+          .select({
+            threadId: mastraMessages.threadId,
+            createdAt: mastraMessages.createdAt,
+          })
           .from(mastraMessages)
           .where(eq(mastraMessages.resourceId, resourceId))
           .orderBy(desc(mastraMessages.createdAt))
           .limit(1);
 
-        if (mostRecentMessage.length > 0) {
+        // Also find the most recently created thread by this user
+        const mostRecentThread = await db
+          .select({
+            id: mastraThreads.id,
+            createdAt: mastraThreads.createdAt,
+          })
+          .from(mastraThreads)
+          .where(eq(mastraThreads.resourceId, resourceId))
+          .orderBy(desc(mastraThreads.createdAt))
+          .limit(1);
+
+        // Compare timestamps to determine which is more recent
+        const messageDate = mostRecentMessage[0]?.createdAt;
+        const threadDate = mostRecentThread[0]?.createdAt;
+
+        if (threadDate && messageDate) {
+          // Both exist - use whichever is more recent
+          if (new Date(threadDate) > new Date(messageDate)) {
+            // Thread is newer than the most recent message, use the empty thread
+            return { threadId: mostRecentThread[0]!.id };
+          } else {
+            // Message is newer, use its thread
+            return { threadId: mostRecentMessage[0]!.threadId };
+          }
+        } else if (mostRecentMessage.length > 0) {
+          // Only messages exist
           return { threadId: mostRecentMessage[0]!.threadId };
+        } else if (mostRecentThread.length > 0) {
+          // Only threads exist (empty thread case)
+          return { threadId: mostRecentThread[0]!.id };
         } else {
+          // No existing messages/threads, create a new one
           const newThread = await memory.createThread({
             resourceId,
           });
