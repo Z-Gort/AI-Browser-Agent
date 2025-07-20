@@ -38,7 +38,7 @@ export default function AppContent() {
       );
       setEnabledTools(allSlugs);
     }
-  }, [integrationsData, enabledTools]);
+  }, [integrationsData]);
 
   //The tools the AI can use
   const connectedAndEnabledTools = useMemo(() => {
@@ -94,21 +94,13 @@ export default function AppContent() {
             <Skeleton className="h-8 w-8 rounded-full" />
           </div>
         </header>
-        <div className="flex-1 p-4 space-y-4">
-          <div className="space-y-3">
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-            <Skeleton className="h-4 w-5/6" />
-          </div>
-          <div className="space-y-3">
-            <Skeleton className="h-4 w-2/3" />
-            <Skeleton className="h-4 w-4/5" />
-            <Skeleton className="h-4 w-1/3" />
-          </div>
-          <div className="space-y-3">
-            <Skeleton className="h-4 w-1/2" />
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-4 w-2/5" />
+        <div className="flex-1 flex flex-col justify-between min-h-[calc(100vh-5rem)]">
+          <div />
+          <div className="p-4 border-t">
+            <div className="flex gap-3">
+              <Skeleton className="h-10 flex-1" />
+              <Skeleton className="h-10 w-15" />
+            </div>
           </div>
         </div>
       </div>

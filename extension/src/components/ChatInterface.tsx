@@ -1,7 +1,7 @@
 import { useChat } from "@ai-sdk/react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef } from "react";
-import { Loader2, Wrench } from "lucide-react";
+import { Loader2, Wrench, ArrowUp } from "lucide-react";
 import type { UIMessage } from "ai";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
@@ -31,8 +31,7 @@ export default function ChatInterface({
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
       const scrollHeight = textareaRef.current.scrollHeight;
-      // Max height of 6 lines (approximately 144px with default line height)
-      const maxHeight = 144;
+      const maxHeight = 110; // Match CSS max-height
       textareaRef.current.style.height = `${Math.min(
         scrollHeight,
         maxHeight
@@ -79,8 +78,8 @@ export default function ChatInterface({
             )}
           {part.toolInvocation.state === "result" &&
             !part.toolInvocation.result.successful && (
-            <div className="mt-1 text-xs text-red-600">❌ Error</div>
-          )}
+              <div className="mt-1 text-xs text-red-600">❌ Error</div>
+            )}
         </div>
       );
     }
@@ -102,7 +101,6 @@ export default function ChatInterface({
           messages.map((message) => (
             <div key={message.id}>
               {message.role === "user" ? (
-                // User messages: keep in bubble, full width
                 <div className="w-full">
                   <div className="w-full rounded-lg px-3 py-2 border border-primary text-foreground">
                     <div className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">
@@ -117,7 +115,6 @@ export default function ChatInterface({
                   </div>
                 </div>
               ) : (
-                // AI messages: markdown rendered, full width, no background
                 <div className="w-full">
                   <div className="text-sm text-foreground prose prose-sm max-w-none">
                     {message.parts ? (
@@ -147,7 +144,6 @@ export default function ChatInterface({
           ))
         )}
 
-        {/* Loading indicator - only show when AI hasn't started responding yet */}
         {isLoading && messages[messages.length - 1].role === "user" && (
           <div className="flex justify-start">
             <div className="bg-muted rounded-lg px-3 py-2">
@@ -164,30 +160,36 @@ export default function ChatInterface({
       </div>
 
       {/* Input Form - Fixed at bottom */}
-      <div className="fixed bottom-0 left-0 right-0 border-t border-border bg-background p-4">
-        <form
-          onSubmit={handleFormSubmit}
-          className="flex space-x-2 max-w-full items-end"
-        >
-          <textarea
-            ref={textareaRef}
-            value={input}
-            onChange={handleInputChange}
-            placeholder="Chat with AI..."
-            className="flex-1 min-h-[40px] max-h-[144px] px-3 py-2 border border-input bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-md resize-none"
-            disabled={isLoading}
-            rows={1}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleFormSubmit(e);
-              }
-            }}
-          />
-          <Button type="submit" disabled={!input.trim() || isLoading} size="sm">
-            Send
-          </Button>
-        </form>
+      <div className="fixed bottom-0 left-0 right-0 border-t border-border bg-background p-3">
+        <div className="relative border border-input rounded-lg bg-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+          <form onSubmit={handleFormSubmit} className="flex flex-col">
+            <textarea
+              ref={textareaRef}
+              value={input}
+              onChange={handleInputChange}
+              placeholder="Chat with AI..."
+              className="w-full max-h-[110px] px-2 py-2 bg-transparent border-0 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+              disabled={isLoading}
+              rows={1}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleFormSubmit(e);
+                }
+              }}
+            />
+            <div className="flex justify-end pb-1.5 pr-1.5">
+              <Button
+                type="submit"
+                disabled={!input.trim() || isLoading}
+                size="sm"
+                className="h-6 w-6 p-0 rounded-full"
+              >
+                <ArrowUp className="h-2 w-2" />
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
