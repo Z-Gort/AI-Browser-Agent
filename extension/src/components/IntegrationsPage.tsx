@@ -220,7 +220,6 @@ export default function IntegrationsPage({
                 connectionStatus === "connecting"
                   ? "Connecting..."
                   : "Verifying...";
-              isDisabled = true;
             } else if (isConnected) {
               buttonText = disconnectMutation.isPending
                 ? "Disconnecting..."

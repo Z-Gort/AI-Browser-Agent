@@ -22,6 +22,7 @@ export const env = createEnv({
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
     NEXT_PUBLIC_NOTION_AUTH_CONFIG_ID: z.string().min(1),
+    NEXT_PUBLIC_GITHUB_AUTH_CONFIG_ID: z.string().min(1),
   },
 
   /**
@@ -36,6 +37,7 @@ export const env = createEnv({
     NEON_URL: process.env.NEON_URL,
     NEXT_PUBLIC_NOTION_AUTH_CONFIG_ID:
       process.env.NEXT_PUBLIC_NOTION_AUTH_CONFIG_ID,
+    NEXT_PUBLIC_GITHUB_AUTH_CONFIG_ID: process.env.NEXT_PUBLIC_GITHUB_AUTH_CONFIG_ID,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**

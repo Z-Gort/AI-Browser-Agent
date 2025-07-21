@@ -22,6 +22,7 @@ type ConnectedAccount = {
   toolkit: {
     slug: string;
   };
+  status?: string;
 };
 
 // Type for the connection status response
@@ -42,6 +43,10 @@ const SUPPORTED_TOOLKITS = [
     slug: "NOTION",
     authConfigId: env.NEXT_PUBLIC_NOTION_AUTH_CONFIG_ID,
   },
+  {
+    slug: "GITHUB",
+    authConfigId: env.NEXT_PUBLIC_GITHUB_AUTH_CONFIG_ID,
+  },
 ];
 
 export const integrationsRouter = createTRPCRouter({
@@ -56,7 +61,13 @@ export const integrationsRouter = createTRPCRouter({
       const connectedToolkitMap = new Map<string, string>(); // slug -> connectionId
 
       connectedAccounts.items.forEach((account: ConnectedAccount) => {
-        connectedToolkitMap.set(account.toolkit.slug.toUpperCase(), account.id);
+        // Only consider connections that are active, not just initiated
+        if (account.status === "ACTIVE") {
+          connectedToolkitMap.set(
+            account.toolkit.slug.toUpperCase(),
+            account.id,
+          );
+        }
       });
 
       // Fetch all toolkits in parallel
@@ -68,6 +79,8 @@ export const integrationsRouter = createTRPCRouter({
           const upperSlug = toolkitConfig.slug.toUpperCase();
           const connectionId = connectedToolkitMap.get(upperSlug);
 
+          const isConnected = !!connectionId;
+
           return {
             id: toolkit.slug.toLowerCase(),
             name: toolkit.name,
@@ -75,7 +88,7 @@ export const integrationsRouter = createTRPCRouter({
             description: toolkit.meta?.description,
             logo: toolkit.meta?.logo,
             categories: toolkit.meta?.categories,
-            isConnected: !!connectionId,
+            isConnected,
             connectionId: connectionId ?? undefined,
           };
         } catch (error) {
@@ -140,6 +153,22 @@ export const integrationsRouter = createTRPCRouter({
 
         if (!toolkitConfig) {
           throw new Error(`Integration ${integrationId} not found.`);
+        }
+
+        // Check for any existing connections for this user and toolkit
+        const existingConnections = await composio.connectedAccounts.list({
+          userIds: [userId],
+        });
+
+        const existingConnection = existingConnections.items.find(
+          (account: ConnectedAccount) =>
+            account.toolkit.slug.toUpperCase() ===
+            toolkitConfig.slug.toUpperCase(),
+        );
+
+        // If there's an existing connection (regardless of status), delete it first
+        if (existingConnection) {
+          await composio.connectedAccounts.delete(existingConnection.id);
         }
 
         // Initiate connection with Composio

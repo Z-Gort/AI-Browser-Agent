@@ -31,21 +31,10 @@ export async function POST(req: NextRequest) {
       enabledToolSlugs: string[];
     };
 
-    const tools = await composio.tools.get(
-      userId,
-      {
-        toolkits: enabledToolSlugs,
-        limit: 30,
-      },
-      {
-        beforeExecute: ({ toolSlug, toolkitSlug, params }) => {
-          console.log(
-            `🔧 Tool about to execute: ${toolSlug} from ${toolkitSlug}`,
-          );
-          return params;
-        },
-      },
-    );
+    const tools = await composio.tools.get(userId, {
+      toolkits: enabledToolSlugs,
+      limit: 30,
+    });
 
     const hasEnabledTools = enabledToolSlugs.length > 0;
 
