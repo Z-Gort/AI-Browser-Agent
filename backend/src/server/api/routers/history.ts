@@ -3,7 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import { db, mastraThreads, mastraMessages } from "~/server/db";
 import { desc, eq } from "drizzle-orm";
-import { memory } from "~/lib/memory";
+import { memory } from "~/lib/agentConfig";
 
 export const historyRouter = createTRPCRouter({
   getOrCreateThreadId: protectedProcedure

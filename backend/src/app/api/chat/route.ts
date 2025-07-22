@@ -1,14 +1,10 @@
-import { anthropic } from "@ai-sdk/anthropic";
 import { auth } from "@clerk/nextjs/server";
-import { Agent } from "@mastra/core/agent";
+import { NewAgentNetwork } from "@mastra/core/network/vNext";
 import { type Message } from "ai";
 import { type NextRequest } from "next/server";
-import {
-  CHAT_AGENT_INSTRUCTIONS_NO_TOOLS,
-  CHAT_AGENT_INSTRUCTIONS_WITH_TOOLS,
-  composio,
-} from "~/lib/agent-instructions";
-import { memory } from "~/lib/memory";
+import { memory, createAgent } from "~/lib/agentConfig";
+import { anthropic } from "@ai-sdk/anthropic";
+import { RuntimeContext } from "@mastra/core/runtime-context";
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,29 +27,55 @@ export async function POST(req: NextRequest) {
       enabledToolSlugs: string[];
     };
 
-    const tools = await composio.tools.get(userId, {
-      toolkits: enabledToolSlugs,
-      limit: 30,
-    });
+    if (!message) {
+      return new Response("No message", { status: 400 });
+    }
 
-    const hasEnabledTools = enabledToolSlugs.length > 0;
+    console.log("Enabled tool slugs:", enabledToolSlugs);
 
-    const chatAgent = new Agent({
-      name: "Chat Agent",
-      instructions: hasEnabledTools
-        ? CHAT_AGENT_INSTRUCTIONS_WITH_TOOLS
-        : CHAT_AGENT_INSTRUCTIONS_NO_TOOLS,
+    // Create agents for each enabled toolkit
+    const agentPromises = enabledToolSlugs.map((toolkit) =>
+      createAgent(userId, toolkit as "github" | "notion"),
+    );
+
+    // Always include a general assistant
+    agentPromises.push(createAgent(userId, "none"));
+
+    const agentList = await Promise.all(agentPromises);
+
+    // Convert to agents object for network
+    const agents = agentList.reduce(
+      (acc, agent, index) => {
+        const key =
+          index < enabledToolSlugs.length
+            ? enabledToolSlugs[index]!
+            : "general";
+        acc[key] = agent;
+        return acc;
+      },
+      {} as Record<string, Awaited<ReturnType<typeof createAgent>>>,
+    );
+
+    const network = new NewAgentNetwork({
+      id: "integrations-network",
+      name: "Integrations Network",
+      instructions:
+        "You coordinate multiple specialized agents to complete tasks efficiently. Analyze the user's request and delegate to the most appropriate agent(s). Use the GitHub Agent for code, repository, and project management tasks. Use the Notion Agent for documentation, note-taking, and workspace organization. Use the General Assistant for conversation and tasks that don't require specific integrations.",
       model: anthropic("claude-sonnet-4-20250514"),
-      tools,
-      memory,
+      agents,
+      memory: memory,
     });
 
-    const result = await chatAgent.stream(message?.content ?? "", {
+    const runtimeContext = new RuntimeContext();
+
+    const result = await network.loopStream(message.content, {
+      runtimeContext,
+      maxIterations: 3,
       threadId,
       resourceId,
     });
 
-    return result.toDataStreamResponse();
+    return result.stream();
   } catch (error) {
     console.error("Chat API error:", error);
     return new Response("Internal server error", { status: 500 });
