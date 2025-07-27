@@ -1,5 +1,3 @@
-<img width="1728" height="916" alt="Screenshot 2025-07-26 at 8 56 36 PM" src="https://github.com/user-attachments/assets/df430207-aece-42b3-8399-e15ba923e66f" />
-
 ## AI Agent Extension
 
 A cursor-like AI agent for your browser that provides intelligent assistance through a side panel interface. This project combines a powerful browser extension frontend with a sophisticated AI backend powered by the Mastra framework, enabling seamless integration with GitHub, Notion, and other productivity tools.
