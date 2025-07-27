@@ -1,7 +1,13 @@
 import { useChat } from "@ai-sdk/react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef } from "react";
-import { Loader2, Wrench, ArrowUp, MessageSquarePlus } from "lucide-react";
+import {
+  Loader2,
+  Wrench,
+  ArrowUp,
+  MessageSquarePlus,
+  AlertCircle,
+} from "lucide-react";
 import type { UIMessage } from "ai";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
@@ -20,7 +26,7 @@ export default function ChatInterface({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading } =
+  const { messages, input, handleInputChange, handleSubmit, status } =
     chatState;
 
   // Auto-scroll to bottom when messages change
@@ -146,16 +152,30 @@ export default function ChatInterface({
           ))
         )}
 
-        {isLoading && messages[messages.length - 1].role === "user" && (
+        {status === "error" && (
           <div className="flex justify-start">
             <div className="bg-muted rounded-lg px-3 py-2">
               <div className="flex items-center space-x-2 text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-sm">thinking...</span>
+                <AlertCircle className="h-4 w-4 animate-spin" />
+                <span className="text-sm">
+                  Something went wrong. Try closing and reopening the panel.
+                </span>
               </div>
             </div>
           </div>
         )}
+
+        {status !== "ready" &&
+          messages[messages.length - 1].role === "user" && (
+            <div className="flex justify-start">
+              <div className="bg-muted rounded-lg px-3 py-2">
+                <div className="flex items-center space-x-2 text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-sm">thinking...</span>
+                </div>
+              </div>
+            </div>
+          )}
 
         {/* Invisible div to scroll to */}
         <div ref={messagesEndRef} />
@@ -171,7 +191,7 @@ export default function ChatInterface({
               onChange={handleInputChange}
               placeholder="Chat with AI..."
               className="w-full max-h-[110px] px-2 py-2 bg-transparent border-0 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 resize-none"
-              disabled={isLoading}
+              disabled={status !== "ready"}
               rows={1}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
@@ -183,7 +203,7 @@ export default function ChatInterface({
             <div className="flex justify-end pb-1.5 pr-1.5">
               <Button
                 type="submit"
-                disabled={!input.trim() || isLoading}
+                disabled={!input.trim() || status !== "ready"}
                 size="sm"
                 className="h-6 w-6 p-0 rounded-full"
               >

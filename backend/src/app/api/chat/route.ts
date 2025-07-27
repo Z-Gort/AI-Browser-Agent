@@ -68,14 +68,13 @@ export async function POST(req: NextRequest) {
 
     const runtimeContext = new RuntimeContext();
 
-    const result = await network.loopStream(message.content, {
+    const result = await network.generate(message.content, {
       runtimeContext,
-      maxIterations: 3,
       threadId,
       resourceId,
     });
 
-    return result.stream();
+    return result
   } catch (error) {
     console.error("Chat API error:", error);
     return new Response("Internal server error", { status: 500 });
